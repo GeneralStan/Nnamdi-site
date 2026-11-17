@@ -13,7 +13,7 @@ export const about = {
   metrics: [
     { value: "6+ years", label: "Experience" },
     { value: "10+", label: "Completed Projects" },
-    { value: "$5.5m", label: "Closed Deals" },
+    { value: "$100M", label: "Closed Deals" },
   ],
 };
 
