@@ -452,10 +452,15 @@ body {
 .viewport-edge {
   position: fixed;
   inset-inline: 0;
-  bottom: 0;
+  /* Lifted 4px off the edge: iOS Safari tints the area behind its toolbar
+     from fixed elements within ~3px of the bottom, which painted a light
+     band there. Off the edge, the page should show through Safari's bar. */
+  bottom: 4px;
   z-index: 40;
-  height: calc(14.4px + 4.8 * var(--t) + 19.2 * var(--g));
-  --pb-max: 8px;
+  /* 31.68px on phones, 42.24px at 1440 (2.2x the earlier 14.4 / 19.2). */
+  height: calc(31.68px + 10.56 * var(--t) + 42.24 * var(--g));
+  /* Strongest blur at the bottom edge: 6px (25% softer than 8px). */
+  --pb-max: 6px;
   --pb-on: 1;
   transition: --pb-on 0.4s var(--ease);
 }
@@ -544,8 +549,25 @@ body {
   position: absolute;
   left: 50%;
   bottom: 0;
-  width: calc(var(--u) * 360);
+  /* --pw: the portrait's width; the shadow below is sized from it. */
+  --pw: calc(var(--u) * 360);
+  width: var(--pw);
   translate: -50% 0;
+}
+
+/* Depth: two shadows that follow the cut-out's outline. A tight, darker
+   contact shadow where he meets the backdrop, and a wide, faint ambient
+   shadow beneath, both falling straight down from the overhead key light.
+   Warm-tinted (the About brown) so they read as shade on the orange
+   backdrop rather than grey. Sized from the portrait so phone and desktop
+   keep the same proportions. */
+.hero-portrait img {
+  filter: drop-shadow(
+      0 calc(var(--pw) * 0.004) calc(var(--pw) * 0.008) rgb(20 2 1 / 0.32)
+    )
+    drop-shadow(
+      0 calc(var(--pw) * 0.028) calc(var(--pw) * 0.06) rgb(20 2 1 / 0.22)
+    );
 }
 
 /* The two tags sit either side of his head. */
@@ -594,7 +616,7 @@ body {
   }
 
   .hero-portrait {
-    width: calc(var(--u) * 711);
+    --pw: calc(var(--u) * 711);
     bottom: calc(var(--u) * -101.4);
   }
 
