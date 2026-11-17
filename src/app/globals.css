@@ -1,0 +1,774 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+  --font-display: "Gambarino", "Iowan Old Style", "Times New Roman", serif;
+  --font-body: "Switzer", var(--font-geist-sans), system-ui, sans-serif;
+
+  --color-ink: #0d0d0d;
+  --color-ink-soft: #040501;
+  --color-oxblood: #140201;
+  --color-oxblood-card: #2e1d1c;
+  --color-linen: #f3f2f2;
+  --color-brass: #d1bf94;
+  --color-maroon: #570904;
+  --color-rule: #450703;
+  --color-paper: #f9fbfc;
+  --color-sand: #f7f4ed;
+  --color-mist: #f5f4f4;
+  --color-blush: #f1eaea;
+  --color-bone: #e2dfdf;
+  --color-body: #333333;
+  --color-body-soft: #4f4f4f;
+  --color-rose: #ebe0e0;
+  --color-muted: #808080;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ------------------------------------------------------------------
+   Fluid scale
+
+   Every size on the page is "phone value -> design value":
+     - phone value at a 393px viewport (the Figma mobile frame, 22:968)
+     - design (Figma) value at 1440px, linear in between
+     - above 1440 the whole layout grows in proportion, locking at 1920 (1.33x)
+
+   --t  progress from 393 to 1440, as a length between 0px and 1px
+   --g  growth past 1440, as a length between 0px and 0.333px
+
+   A token is   calc(PHONE + (DESIGN - PHONE) * var(--t) + DESIGN * var(--g))
+   One-off sizes in components use fluid(phone, design) from src/lib/fluid.ts,
+   which emits the same formula.
+
+   Phone values come from the Figma mobile frame; desktop values from the
+   1440 frame (6:987).
+   ------------------------------------------------------------------ */
+:root {
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --t: clamp(0px, (100vw - 393px) / 1047, 1px);
+  --g: clamp(0px, (100vw - 1440px) / 1440, 0.33334px);
+
+  /* One design pixel, scaled strictly with the viewport (used by layouts that
+     only exist at desktop widths, and by the hero art). */
+  --d: calc(min(100vw, 1920px) / 1440);
+  /* 1px up to 1440, then grows with the layout. */
+  --k: calc(1px + var(--g));
+
+  /* Type                          phone -> design */
+  --fs-display: calc(44px + 20 * var(--t) + 64 * var(--g)); /* 44 -> 64 */
+  --fs-title: calc(36px + 20 * var(--t) + 56 * var(--g)); /* 36 -> 56 */
+  --fs-stat: calc(24px + 16 * var(--t) + 40 * var(--g)); /* 24 -> 40 */
+  --fs-quote: calc(20px + 8 * var(--t) + 28 * var(--g)); /* 20 -> 28 */
+  --fs-date: calc(16px + 4 * var(--t) + 20 * var(--g)); /* 16 -> 20 */
+  --fs-name: calc(18px + 6 * var(--t) + 24 * var(--g)); /* 18 -> 24 */
+  --fs-body: calc(16px + 2 * var(--t) + 18 * var(--g)); /* 16 -> 18 */
+  --fs-ui: calc(14px + 2 * var(--t) + 16 * var(--g)); /* 14 -> 16 */
+  --fs-label: calc(12px + 4 * var(--t) + 16 * var(--g)); /* 12 -> 16 */
+  --fs-small: calc(14px + 0 * var(--t) + 14 * var(--g)); /* 14 -> 14 */
+  /* Inputs stay at 16px on phones so iOS does not zoom the page on focus. */
+  --fs-field: calc(16px + 16 * var(--g));
+
+  /* Layout */
+  --gutter: calc(16px + 104 * var(--t) + 120 * var(--g)); /* 16 -> 120 */
+  --shell-max: calc(1200px + 1200 * var(--g));
+  --rail-gap: calc(8px + 12 * var(--t) + 20 * var(--g)); /* 8 -> 20 */
+  --radius: calc(8px + 0 * var(--t) + 8 * var(--g)); /* 8 -> 8 */
+
+  /* Components */
+  --nav-h: calc(76px + 10 * var(--t) + 86 * var(--g)); /* 76 -> 86 */
+  --btn-h: calc(36px + 4 * var(--t) + 40 * var(--g)); /* 36 -> 40 */
+  /* Height of the fixed bar once the page has scrolled. */
+  --nav-h-compact: calc(var(--btn-h) + 24 * var(--k));
+  --photo-w: calc(300px + 394 * var(--t) + 694 * var(--g)); /* 300 -> 694 */
+  --field-py: calc(11px + 0 * var(--t) + 11 * var(--g)); /* 11 -> 11 */
+  --field-px: calc(16px + 0 * var(--t) + 16 * var(--g)); /* 16 -> 16 */
+}
+
+/* Registered so it can be transitioned (progressive blur fade). */
+@property --pb-on {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+html {
+  scroll-padding-top: calc(var(--nav-h-compact) + 16px);
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-maroon);
+  color: #ffffff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-maroon);
+  outline-offset: 3px;
+}
+
+/* Content column: 1200px with 120px margins at 1440, 20px margins on a phone. */
+@utility shell {
+  width: min(100% - 2 * var(--gutter), var(--shell-max));
+  margin-inline: auto;
+}
+
+/* ---------- Type styles (sizes come from the fluid tokens) ---------- */
+
+@utility t-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--fs-display);
+  line-height: 0.96;
+  letter-spacing: calc(-2 * var(--k));
+}
+
+@utility t-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--fs-title);
+  /* 36/48 on phones, 56/56 on desktop. */
+  line-height: calc(48px + 8 * var(--t) + 56 * var(--g));
+  letter-spacing: calc(-1 * var(--k));
+}
+
+@utility t-body {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: calc(24 * var(--k));
+  letter-spacing: calc(-0.32 * var(--k));
+}
+
+@utility t-ui {
+  font-family: var(--font-body);
+  font-size: var(--fs-ui);
+  line-height: 1.25;
+  letter-spacing: calc(-0.32 * var(--k));
+}
+
+@utility t-small {
+  font-family: var(--font-body);
+  font-size: var(--fs-small);
+  line-height: 1.15;
+  letter-spacing: calc(-0.32 * var(--k));
+}
+
+@utility t-stat {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--fs-stat);
+  line-height: 1;
+  letter-spacing: calc(-2 * var(--k));
+}
+
+@utility t-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: 1.25;
+  letter-spacing: calc(-0.32 * var(--k));
+}
+
+@utility t-date {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: var(--fs-date);
+  line-height: calc(24 * var(--k));
+  letter-spacing: calc(-1 * var(--k));
+}
+
+@utility t-quote {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--fs-quote);
+  line-height: 1.2;
+  letter-spacing: calc(-0.32 * var(--k));
+}
+
+@utility t-name {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--fs-name);
+  line-height: calc(24 * var(--k));
+  letter-spacing: calc(-0.32 * var(--k));
+}
+
+/* ---------- Buttons & links ---------- */
+
+/* Button component (Figma 1:2118). Mobile size hugs its label with 16px
+   side padding (36 tall, 14/16); desktop size is a fixed width set by the
+   caller (40 tall, 16/20). Hover fills dark over 150ms: ease-in on the way
+   in, ease-out on the way out (the transition on each state applies when
+   entering it). */
+.btn-outline {
+  display: inline-flex;
+  height: var(--btn-h);
+  align-items: center;
+  justify-content: center;
+  padding-inline: 16px;
+  border: 1px solid rgb(20 2 1 / 0.6);
+  background: #ffffff;
+  color: var(--color-oxblood);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--fs-ui);
+  line-height: calc(16px + 4 * var(--t) + 20 * var(--g));
+  letter-spacing: calc(-0.32 * var(--k));
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease-out,
+    color 0.15s ease-out,
+    border-color 0.15s ease-out,
+    transform 0.2s var(--ease);
+}
+
+.btn-outline:hover {
+  background: var(--color-oxblood);
+  border-color: var(--color-oxblood);
+  color: #ffffff;
+  transition-timing-function: ease-in, ease-in, ease-in, var(--ease);
+}
+
+.btn-outline:active {
+  transform: scale(0.97);
+}
+
+.btn-outline:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.nav-link {
+  position: relative;
+  font-family: var(--font-sans);
+  font-size: var(--fs-ui);
+  line-height: 1.5;
+  letter-spacing: -0.0375em;
+  color: var(--color-ink-soft);
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -2px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s var(--ease);
+}
+
+.nav-link:hover::after,
+.nav-link:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ---------- Fixed navigation ---------- */
+
+/* Phones (Figma 35:1216): always a solid #f9fbfc bar, 76px tall; opening
+   the menu grows it into a panel. From 640px: transparent over the hero,
+   then a slightly shorter #f9fbfc bar once the page scrolls. Either way a
+   soft blurred edge appears under the bar when content slides beneath it. */
+.site-nav {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 50;
+  background: var(--color-paper);
+  animation: fade-drop 0.9s var(--ease) both;
+  transition: background-color 0.4s var(--ease);
+}
+
+.site-nav-bar {
+  height: var(--nav-h);
+  transition: height 0.5s var(--ease);
+}
+
+@media (min-width: 640px) {
+  .site-nav:not([data-scrolled="true"]) {
+    background: transparent;
+  }
+
+  .site-nav[data-scrolled="true"] .site-nav-bar {
+    height: var(--nav-h-compact);
+  }
+}
+
+/* Behind the open mobile menu: dims and blurs the page so the links stand
+   out. Tapping it closes the menu. */
+.menu-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: rgb(20 2 1 / 0.28);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.nav-edge {
+  position: absolute;
+  inset-inline: 0;
+  top: 100%;
+  height: 24px;
+  --pb-on: 0;
+  transition: --pb-on 0.4s var(--ease);
+}
+
+.site-nav[data-scrolled="true"] .nav-edge {
+  --pb-on: 1;
+}
+
+/* Three bars that fold into a cross when the menu opens (Figma Icon/List:
+   18.75 x 2.25 bars, 6px apart, inside a 24px icon). */
+.menu-icon {
+  position: relative;
+  display: block;
+  width: 18.75px;
+  height: 14.25px;
+}
+
+.menu-icon > span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2.25px;
+  border-radius: 2px;
+  background: #424242;
+  transition:
+    transform 0.3s var(--ease),
+    opacity 0.2s var(--ease),
+    background-color 0.3s var(--ease);
+}
+
+.menu-icon > span:nth-child(1) {
+  top: 0;
+}
+
+.menu-icon > span:nth-child(2) {
+  top: 6px;
+}
+
+.menu-icon > span:nth-child(3) {
+  top: 12px;
+}
+
+[aria-expanded="true"] > .menu-icon > span {
+  background: #000f33;
+}
+
+[aria-expanded="true"] > .menu-icon > span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+[aria-expanded="true"] > .menu-icon > span:nth-child(2) {
+  opacity: 0;
+}
+
+[aria-expanded="true"] > .menu-icon > span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* ---------- Progressive blur ---------- */
+
+/* Four stacked backdrop blurs, each masked to an overlapping band, so the
+   blur ramps up toward one edge. data-towards sets that edge; --pb-max is
+   the strongest blur; --pb-on (0..1) fades the whole effect. Animating
+   opacity here would cut the blur off mid-fade, hence --pb-on. */
+.pblur {
+  pointer-events: none;
+  --pb-dir: to bottom;
+}
+
+.pblur[data-towards="top"] {
+  --pb-dir: to top;
+}
+
+.pblur > span {
+  position: absolute;
+  inset: 0;
+  --pb-mask: linear-gradient(
+    var(--pb-dir),
+    transparent var(--a),
+    #000 var(--b),
+    #000 var(--c),
+    transparent var(--d)
+  );
+  -webkit-mask-image: var(--pb-mask);
+  mask-image: var(--pb-mask);
+  -webkit-backdrop-filter: blur(calc(var(--pb-max) * var(--pb-k) * var(--pb-on)));
+  backdrop-filter: blur(calc(var(--pb-max) * var(--pb-k) * var(--pb-on)));
+}
+
+.pblur > span:nth-child(1) {
+  --pb-k: 0.125;
+  --a: 0%;
+  --b: 16.7%;
+  --c: 33.3%;
+  --d: 50%;
+}
+
+.pblur > span:nth-child(2) {
+  --pb-k: 0.25;
+  --a: 16.7%;
+  --b: 33.3%;
+  --c: 50%;
+  --d: 66.7%;
+}
+
+.pblur > span:nth-child(3) {
+  --pb-k: 0.5;
+  --a: 33.3%;
+  --b: 50%;
+  --c: 66.7%;
+  --d: 83.3%;
+}
+
+.pblur > span:nth-child(4) {
+  --pb-k: 1;
+  --a: 50%;
+  --b: 66.7%;
+  --c: 100%;
+  --d: 100%;
+}
+
+/* Fixed strip at the bottom of the viewport: content softens as it leaves. */
+.viewport-edge {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 40;
+  height: calc(14.4px + 4.8 * var(--t) + 19.2 * var(--g));
+  --pb-max: 8px;
+  --pb-on: 1;
+  transition: --pb-on 0.4s var(--ease);
+}
+
+/* Off at the very end of the page so the footer finishes crisp. */
+.viewport-edge[data-off="true"] {
+  --pb-on: 0;
+}
+
+/* ---------- Hero ---------- */
+
+/* --u is one design pixel of the hero art. On phones the art is drawn on the
+   393 mobile frame; from 640px up it is the 1440 frame scaled with the
+   viewport. */
+.hero {
+  --u: calc(min(100vw, 480px) / 393);
+  position: relative;
+  overflow: hidden;
+  /* Paper, except the last few pixels, which take the About colour. The
+     hero's height is fractional at most widths, so without this a hairline
+     can show between the backdrop and the next section. */
+  background:
+    linear-gradient(var(--color-paper), var(--color-paper)) top / 100%
+      calc(100% - 4px) no-repeat,
+    var(--color-oxblood);
+  /* The nav is fixed, so the hero reserves its height. */
+  padding-top: var(--nav-h);
+}
+
+.hero-name {
+  position: relative;
+  /* Always behind the man: the stage below sits one layer up. */
+  z-index: 0;
+  /* 101 from the top of the mobile frame, under the 76px bar. */
+  margin-top: calc(var(--u) * 25);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: calc(var(--u) * 80);
+  line-height: 0.96;
+  letter-spacing: -0.0067em;
+  text-align: center;
+  color: var(--color-ink);
+}
+
+.hero-word {
+  display: inline-block;
+  overflow: hidden;
+  padding: 0.12em 0.04em;
+  margin: -0.12em -0.04em;
+  vertical-align: top;
+}
+
+/* Each letter is its own box so it can rise through the word's mask. */
+.hero-char {
+  display: inline-block;
+}
+
+.hero-stage {
+  position: relative;
+  z-index: 1;
+  height: calc(var(--u) * 337);
+}
+
+/* Backdrop + portrait live in one layer so they move as a single piece. */
+.hero-art {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-band {
+  position: absolute;
+  inset-inline: 0;
+  /* Overshoots the hero by a pixel; the section clips it. */
+  bottom: -1px;
+  height: calc(var(--u) * 256 + 1px);
+  transform-origin: 50% 100%;
+  /* Same colour as the About section: if the photo lands a fraction of a
+     pixel short of the bottom edge, what shows is indistinguishable from the
+     section below. (The layer is invisible until the photo has decoded.) */
+  background: var(--color-oxblood);
+}
+
+/* The full-length portrait. On phones all of it shows; on desktop its
+   lower 101px run past the hero and are clipped. */
+.hero-portrait {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: calc(var(--u) * 360);
+  translate: -50% 0;
+}
+
+/* The two tags sit either side of his head. */
+.hero-tags {
+  font-family: var(--font-body);
+  font-size: max(9px, calc(var(--u) * 10));
+  line-height: 1.6;
+  letter-spacing: -0.032em;
+  color: var(--color-ink-soft);
+  white-space: nowrap;
+}
+
+.hero-tag {
+  position: absolute;
+  top: calc(var(--u) * 15);
+}
+
+.hero-tag:first-child {
+  right: calc(50% + var(--u) * 22.5);
+}
+
+.hero-tag:last-child {
+  left: calc(50% + var(--u) * 61.5);
+}
+
+/* The load-in itself (art layer, letters, tags) is driven by Motion in
+   src/components/Hero.tsx; timings live in src/lib/motion.ts. */
+
+@media (min-width: 640px) {
+  .hero {
+    --u: var(--d);
+  }
+
+  .hero-name {
+    margin-top: calc(var(--u) * 50);
+    font-size: calc(var(--u) * 120);
+    white-space: nowrap;
+  }
+
+  .hero-stage {
+    height: calc(var(--u) * 549);
+  }
+
+  .hero-band {
+    height: calc(var(--u) * 400 + 1px);
+  }
+
+  .hero-portrait {
+    width: calc(var(--u) * 711);
+    bottom: calc(var(--u) * -101.4);
+  }
+
+  .hero-tags {
+    font-size: max(11px, calc(var(--u) * 16));
+    line-height: 1.75;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-tag {
+    position: absolute;
+    top: calc(var(--u) * 49);
+  }
+
+  .hero-tag:first-child {
+    right: calc(50% + var(--u) * 44);
+  }
+
+  .hero-tag:last-child {
+    left: calc(50% + var(--u) * 131);
+  }
+}
+
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Horizontal rails (project photos, testimonials) ---------- */
+
+.rail {
+  --rail-indent: 0px;
+  --rail-start: calc(
+    max(var(--gutter), (100% - var(--shell-max)) / 2) + var(--rail-indent)
+  );
+  display: flex;
+  gap: var(--rail-gap);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-inline: var(--rail-start) var(--gutter);
+  /* Room for the reveal offset so nothing is clipped mid-animation. */
+  padding-bottom: 28px;
+  margin-bottom: -28px;
+  scroll-padding-inline-start: var(--rail-start);
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+.rail[data-dragging="true"] {
+  cursor: grabbing;
+}
+
+.rail > * {
+  flex: none;
+}
+
+.rail:focus-visible {
+  outline-offset: -2px;
+}
+
+@media (pointer: coarse) {
+  .rail {
+    scroll-snap-type: x mandatory;
+    cursor: auto;
+  }
+
+  .rail > * {
+    scroll-snap-align: start;
+  }
+}
+
+@media (min-width: 1024px) {
+  .rail-indented {
+    --rail-indent: calc(103 * var(--d));
+  }
+}
+
+.photo {
+  position: relative;
+  width: var(--photo-w);
+  aspect-ratio: 694 / 480;
+  overflow: hidden;
+  background: #e9ecee;
+}
+
+.photo img {
+  transition: transform 1.2s var(--ease);
+}
+
+@media (hover: hover) {
+  .rail:not([data-dragging="true"]) .photo:hover img {
+    transform: scale(1.035);
+  }
+}
+
+/* ---------- Form ---------- */
+
+.field {
+  width: 100%;
+  border: 1px solid rgb(69 7 3 / 0.2);
+  border-radius: 0;
+  background: #ffffff;
+  padding: var(--field-py) var(--field-px);
+  font-family: var(--font-body);
+  font-size: var(--fs-field);
+  line-height: 1.5;
+  letter-spacing: calc(-0.32 * var(--k));
+  color: var(--color-oxblood);
+  appearance: none;
+  transition:
+    border-color 0.3s var(--ease),
+    box-shadow 0.3s var(--ease);
+}
+
+.field::placeholder {
+  color: var(--color-muted);
+  opacity: 1;
+}
+
+.field:hover {
+  border-color: rgb(69 7 3 / 0.4);
+}
+
+.field:focus {
+  outline: none;
+  border-color: var(--color-oxblood);
+  box-shadow: 0 0 0 3px rgb(87 9 4 / 0.08);
+}
+
+.field[aria-invalid="true"] {
+  border-color: var(--color-maroon);
+}
+
+/* ---------- Reduced motion ---------- */
+
+/* Motion-driven animation follows the same setting through
+   <MotionConfig reducedMotion="user"> in src/components/Providers.tsx. */
+@media (prefers-reduced-motion: reduce) {
+  .site-nav {
+    animation: none;
+  }
+
+  .site-nav,
+  .site-nav-bar,
+  .nav-edge,
+  .viewport-edge,
+  .menu-icon > span,
+  .photo img,
+  .btn-outline,
+  .nav-link::after {
+    transition: none;
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "version": 2,
+  "skills": {
+    "60fps-animation": {
+      "source": "iart-ai/web-animation-skills",
+      "commit": "ed3a045192679b24d32090ee7a983871311ababd",
+      "sourceType": "github",
+      "skillPath": "skills/60fps-animation/SKILL.md",
+      "computedHash": "3783bf5371256b4a496fb3a3ee3e345a66887dc9141091b49984e47bad822811",
+      "installMode": "copy"
+    },
+    "accessible-animation": {
+      "source": "iart-ai/web-animation-skills",
+      "commit": "ed3a045192679b24d32090ee7a983871311ababd",
+      "sourceType": "github",
+      "skillPath": "skills/accessible-animation/SKILL.md",
+      "computedHash": "396a43fbb461daa4cb93a2795910459ae96c82937f965906b2b84f2703aef76c",
+      "installMode": "copy"
+    },
+    "animation-principles": {
+      "source": "iart-ai/motion-design-skills",
+      "commit": "b85e50c4cef5ff17aa2187a10d49d2dae9226c74",
+      "sourceType": "github",
+      "skillPath": "skills/animation-principles/SKILL.md",
+      "computedHash": "429233e8c4a429b072130b231afb072eace2f5f5e9d6d7c7566ed8c2bd4aec83",
+      "installMode": "copy"
+    },
+    "kinetic-typography": {
+      "source": "iart-ai/kinetic-typography-skills",
+      "commit": "2b79c81230c6647a344844f9ed53b6fa07f3f1f9",
+      "sourceType": "github",
+      "skillPath": "skills/kinetic-typography/SKILL.md",
+      "computedHash": "7f5a42a68017f67a8dc140ecf676820319cd22b98b909f9e8b615448baf19d8c",
+      "installMode": "copy"
+    },
+    "micro-interaction": {
+      "source": "iart-ai/web-animation-skills",
+      "commit": "ed3a045192679b24d32090ee7a983871311ababd",
+      "sourceType": "github",
+      "skillPath": "skills/micro-interaction/SKILL.md",
+      "computedHash": "35fe04bed325e1f7cdbf7d25e7327f33b868b854a999eaa0d523a0899331d071",
+      "installMode": "copy"
+    },
+    "motion-art-direction": {
+      "source": "iart-ai/motion-design-skills",
+      "commit": "b85e50c4cef5ff17aa2187a10d49d2dae9226c74",
+      "sourceType": "github",
+      "skillPath": "skills/motion-art-direction/SKILL.md",
+      "computedHash": "4a43cd9cd57b01e77e3c76e63a4722b3c8a74277aae1d9d471a93e7fea8a7038",
+      "installMode": "copy"
+    },
+    "svg-animation": {
+      "source": "iart-ai/web-animation-skills",
+      "commit": "ed3a045192679b24d32090ee7a983871311ababd",
+      "sourceType": "github",
+      "skillPath": "skills/svg-animation/SKILL.md",
+      "computedHash": "cfcf1a801009db1ee4d5141c749acbf6c5eff23534610c4ac3c87c16580809df",
+      "installMode": "copy"
+    }
+  }
+}
