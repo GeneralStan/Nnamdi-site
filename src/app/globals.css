@@ -452,10 +452,7 @@ body {
 .viewport-edge {
   position: fixed;
   inset-inline: 0;
-  /* Lifted 4px off the edge: iOS Safari tints the area behind its toolbar
-     from fixed elements within ~3px of the bottom, which painted a light
-     band there. Off the edge, the page should show through Safari's bar. */
-  bottom: 4px;
+  bottom: 0;
   z-index: 40;
   /* 31.68px on phones, 42.24px at 1440 (2.2x the earlier 14.4 / 19.2). */
   height: calc(31.68px + 10.56 * var(--t) + 42.24 * var(--g));
@@ -468,6 +465,13 @@ body {
 /* Off at the very end of the page so the footer finishes crisp. */
 .viewport-edge[data-off="true"] {
   --pb-on: 0;
+}
+
+/* Fully removed once faded out. iOS Safari tints the area behind its
+   toolbar from any fixed element at the bottom edge, so on touch devices
+   the strip must not exist at all while the page should show through. */
+.viewport-edge[data-gone="true"] {
+  display: none;
 }
 
 /* ---------- Hero ---------- */

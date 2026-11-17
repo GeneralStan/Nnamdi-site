@@ -24,7 +24,7 @@ Use `<Reveal>` (`src/components/Reveal.tsx`) for scroll reveals rather than writ
 
 ## Edge effects
 
-- **Progressive blur** (`src/components/ProgressiveBlur.tsx`, `.pblur` in globals.css): four stacked backdrop blurs, each masked to a band. Used under the nav bar once the page scrolls (`.nav-edge`, 24px tall, 4px max) and as a thin fixed strip at the bottom of the viewport (`.viewport-edge`, 32–42px tall, 6px max, off at the end of the page). Fade it with `--pb-on`, never an ancestor's `opacity` (that cuts the backdrop off).
+- **Progressive blur** (`src/components/ProgressiveBlur.tsx`, `.pblur` in globals.css): four stacked backdrop blurs, each masked to a band. Used under the nav bar once the page scrolls (`.nav-edge`, 24px tall, 4px max) and as a fixed strip at the bottom of the viewport (`.viewport-edge`, 32–42px tall, 6px max). Desktop: always on except at the end of the page. Touch devices: only while scrolling down and never while the hero is on screen; when hidden it is removed (`data-gone`, `display: none`), because iOS Safari tints the area behind its toolbar from any fixed element at the bottom edge. Fade it with `--pb-on`, never an ancestor's `opacity` (that cuts the backdrop off).
 - **Rails**: no edge fades (the owner found them noisy). Project photos drift inside their cards against the rail's scroll (`ParallaxPhoto`: Motion `useScroll` on the rail via `useRail()`, a damped spring, ±5%); off for reduced motion.
 - **Mobile menu**: panel height animates to `auto` with Motion, links stagger in 60ms apart; a dim, blurred scrim (`.menu-scrim`) covers the page and closes the menu on tap; page scroll is locked while open.
 
