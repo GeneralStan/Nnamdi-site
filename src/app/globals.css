@@ -322,17 +322,36 @@ body {
   backdrop-filter: blur(8px);
 }
 
+/* Top scroll edge: content fades into the bar as it slides under it. A
+   plain colour fade (no blur), 24px on phones to 32px at 1440, with a
+   smooth (smoothstep) ramp. */
 .nav-edge {
   position: absolute;
   inset-inline: 0;
   top: 100%;
-  height: 24px;
-  --pb-on: 0;
-  transition: --pb-on 0.4s var(--ease);
+  height: calc(24px + 8 * var(--t) + 32 * var(--g));
+  pointer-events: none;
+  background: var(--color-paper);
+  --nav-edge-mask: linear-gradient(
+    to bottom,
+    #000 0%,
+    rgb(0 0 0 / 0.957) 12.5%,
+    rgb(0 0 0 / 0.844) 25%,
+    rgb(0 0 0 / 0.684) 37.5%,
+    rgb(0 0 0 / 0.5) 50%,
+    rgb(0 0 0 / 0.316) 62.5%,
+    rgb(0 0 0 / 0.156) 75%,
+    rgb(0 0 0 / 0.043) 87.5%,
+    transparent 100%
+  );
+  -webkit-mask-image: var(--nav-edge-mask);
+  mask-image: var(--nav-edge-mask);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
 }
 
 .site-nav[data-scrolled="true"] .nav-edge {
-  --pb-on: 1;
+  opacity: 1;
 }
 
 /* Three bars that fold into a cross when the menu opens (Figma Icon/List:

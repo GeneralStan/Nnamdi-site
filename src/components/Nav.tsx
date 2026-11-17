@@ -5,7 +5,6 @@ import * as m from "motion/react-m";
 import { useEffect, useState } from "react";
 import { navLinks } from "@/lib/content";
 import { EASE_ENTER, EASE_FADE } from "@/lib/motion";
-import { ProgressiveBlur } from "./ProgressiveBlur";
 
 /**
  * Fixed navigation.
@@ -152,14 +151,8 @@ export function Nav() {
           )}
         </AnimatePresence>
 
-        {/* Scroll edge: content softens as it slides under the bar. */}
-        <div className="nav-edge" aria-hidden="true">
-          <ProgressiveBlur
-            towards="top"
-            className="absolute inset-0"
-            style={{ ["--pb-max" as string]: "4px" }}
-          />
-        </div>
+        {/* Top scroll edge: content fades into the bar as it slides under. */}
+        <div className="nav-edge" aria-hidden="true" />
       </header>
     </>
   );
